@@ -1,0 +1,68 @@
+.interactiveExercise {
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background-color: var(--ifm-color-emphasis-50);
+  border-radius: 8px;
+  border-left: 4px solid var(--ifm-color-primary);
+}
+
+.exerciseHeader h4 {
+  margin: 0 0 0.5rem 0;
+  color: var(--ifm-color-primary);
+  font-size: 1.1rem;
+}
+
+.description {
+  margin: 0 0 1rem 0;
+  color: var(--ifm-color-emphasis-700);
+  font-size: 0.95rem;
+  line-height: 1.5;
+}
+
+.solutionSection {
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--ifm-color-emphasis-300);
+}
+
+.solutionToggle {
+  background: none;
+  border: 1px solid var(--ifm-color-primary);
+  color: var(--ifm-color-primary);
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+
+.solutionToggle:hover {
+  background-color: var(--ifm-color-primary);
+  color: white;
+}
+
+.solution {
+  margin-top: 1rem;
+  padding: 1rem;
+  background-color: var(--ifm-color-warning-contrast-background);
+  border-radius: 6px;
+  border: 1px solid var(--ifm-color-warning-contrast-border);
+}
+
+.solution h5 {
+  margin: 0 0 0.75rem 0;
+  color: var(--ifm-color-warning-dark);
+}
+
+.solution pre {
+  margin: 0;
+  background-color: var(--ifm-color-emphasis-100);
+  padding: 0.75rem;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  overflow-x: auto;
+}
+
+.solution code {
+  font-family: var(--ifm-font-family-monospace);
+}

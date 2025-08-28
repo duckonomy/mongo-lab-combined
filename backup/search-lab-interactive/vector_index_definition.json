@@ -1,0 +1,10 @@
+{
+  "fields": [
+    {
+      "type": "vector",
+      "path": "embeddings",
+      "numDimensions": 1408,
+      "similarity": "cosine"
+    }
+  ]
+}

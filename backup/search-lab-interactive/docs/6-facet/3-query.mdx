@@ -1,0 +1,226 @@
+# 🦸 Query with facets
+
+Now that your index is in place, you can query using it.
+
+You will need to use the `$searchMeta` aggregation stage to query your data. You can find more about this stage and how to use it in the <Link to="https://www.mongodb.com/docs/atlas/atlas-search/query-syntax/#mongodb-pipeline-pipe.-searchMeta">Atlas Search documentation</Link>.
+
+Now that you have an index on the `genres` and `year` fields, try creating a query that returns the number of books in each genre, for books published in the 2000s.
+
+<details>
+  <summary>Click to see the answer</summary>
+  <div>
+
+```js
+{
+  $searchMeta: {
+    "index": "facetsIndexName",
+    "facet": {
+      "operator": {
+        "range": {
+          "path": "year",
+          "gte": 2000,
+          "lte": 2010
+        }
+      },
+      "facets": {
+        "genresFacet": {
+          "type": "string",
+          "path": "genres"
+        }
+      }
+    }
+  }
+}
+```
+
+  </div>
+</details>
+
+## Interactive Facet Search Practice
+
+:::note
+These exercises require a facet-enabled search index. Create a new search index with the name "facetsIndexName" using the JSON editor:
+
+```json
+{
+  "mappings": {
+    "dynamic": false,
+    "fields": {
+      "genres": {
+        "type": "stringFacet"
+      },
+      "year": {
+        "type": "number"
+      }
+    }
+  }
+}
+```
+:::
+
+<InteractiveExercise
+  title="Genre Facets"
+  description="Use $searchMeta to get facet counts for different genres in books from the 2000s."
+  initialQuery={`[
+  {
+    $searchMeta: {
+      index: "facetsIndexName",
+      facet: {
+        operator: {
+          range: {
+            path: "year",
+            gte: 2000,
+            lte: 2010
+          }
+        },
+        facets: {
+          genresFacet: {
+            type: "string",
+            path: "genres"
+          }
+        }
+      }
+    }
+  }
+]`}
+  expectedResult={{
+    type: "contains",
+    fields: ["facet"]
+  }}
+  hint="Use $searchMeta with facet operator to get genre counts for books from 2000-2010"
+  solution={`[
+  {
+    $searchMeta: {
+      index: "facetsIndexName",
+      facet: {
+        operator: {
+          range: {
+            path: "year",
+            gte: 2000,
+            lte: 2010
+          }
+        },
+        facets: {
+          genresFacet: {
+            type: "string",
+            path: "genres"
+          }
+        }
+      }
+    }
+  }
+]`}
+  collection="books"
+/>
+
+### Multiple Facets
+
+<InteractiveExercise
+  title="Multiple Facet Categories"
+  description="Create facets for both genres and page count ranges for cooking books."
+  initialQuery={`[
+  {
+    $searchMeta: {
+      index: "facetsIndexName",
+      facet: {
+        operator: {
+          text: {
+            query: "cooking",
+            path: "genres"
+          }
+        },
+        facets: {
+          genresFacet: {
+            type: "string",
+            path: "genres"
+          }
+        }
+      }
+    }
+  }
+]`}
+  expectedResult={{
+    type: "contains",
+    fields: ["facet"]
+  }}
+  hint="Use multiple facets: string facet for genres and number facet with boundaries for pages"
+  solution={`[
+  {
+    $searchMeta: {
+      index: "facetsIndexName",
+      facet: {
+        operator: {
+          text: {
+            query: "cooking",
+            path: "genres"
+          }
+        },
+        facets: {
+          genresFacet: {
+            type: "string",
+            path: "genres"
+          }
+        }
+      }
+    }
+  }
+]`}
+  collection="books"
+/>
+
+### Date Range Facets
+
+<InteractiveExercise
+  title="Date Range Facets"
+  description="Create date range facets to group books by decades for programming books."
+  initialQuery={`[
+  {
+    $searchMeta: {
+      index: "facetsIndexName",
+      facet: {
+        operator: {
+          range: {
+            path: "year",
+            gte: 1990,
+            lte: 2020
+          }
+        },
+        facets: {
+          genresFacet: {
+            type: "string",
+            path: "genres"
+          }
+        }
+      }
+    }
+  }
+]`}
+  expectedResult={{
+    type: "contains",
+    fields: ["facet"]
+  }}
+  hint="Use date facets with boundaries to group books by decades"
+  solution={`[
+  {
+    $searchMeta: {
+      index: "facetsIndexName",
+      facet: {
+        operator: {
+          range: {
+            path: "year",
+            gte: 1990,
+            lte: 2020
+          }
+        },
+        facets: {
+          genresFacet: {
+            type: "string",
+            path: "genres"
+          }
+        }
+      }
+    }
+  }
+]`}
+  collection="books"
+/>

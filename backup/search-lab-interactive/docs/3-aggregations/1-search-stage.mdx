@@ -1,0 +1,217 @@
+# 👐 Construct Search Queries
+
+You can construct Atlas Search queries with the `$search` aggregation pipeline stage.
+
+<Link to="https://mongodb.com/docs/manual/core/aggregation-pipeline">MongoDB aggregation pipelines</Link> are multi-stage "assembly lines" that reshape data and perform calculations. Pipelines can consist of one or more aggregation stages, performing different operations like match, group, sort, and output. For an exhaustive list of all available stages, visit <Link to="https://mongodb.com/docs/manual/reference/operator/aggregation-pipeline/#std-label-aggregation-pipeline-operator-reference">the complete list of pipeline operators</Link>.
+
+:::caution
+If you are not familiar with the aggregation pipelines, you should start with [Advanced Querying With Aggregation Pipelines](https://mongodb-developer.github.io/aggregation-pipeline-lab/).
+:::
+
+In this section, we'll build an aggregation pipeline with the `$search` stage which performs full-text search using the Atlas Search index you just created.
+
+## Aggregations in the Atlas UI
+
+Navigate to the **Collections** tab of your database deployment, pick the `books` collection, and navigate to the **Aggregation** tab from the navbar under your collection details.
+
+<Screenshot alt="Aggregations tab highlighted on the collection details page" src="img/screenshots/3-aggregations/1-search-stage/1-aggregation-tab.png" url="https://cloud.mongodb.com" />
+
+:::tip
+The Atlas UI can start feeling a bit cramped at this point. You can also use the aggregation pipeline builder in <Link to="https://www.mongodb.com/products/tools/compass">Compass</Link> for a better experience.
+:::
+
+Click the **Add Stage** button and type **$search** in the **select** input.
+
+<Screenshot alt="Stage 1 of the pipeline with the $search stage selected" src="img/screenshots/3-aggregations/1-search-stage/2-search-stage.png" url="https://cloud.mongodb.com" />
+
+Add the following code for the `$search` stage.
+
+```js
+{
+    index: "fulltextsearch",
+    text: {
+        query: "cooking",
+        path: ["title"]
+    }
+}
+```
+
+The stage uses the "fulltextsearch" index. You don't need to explicitly define the index if it's "default" but you can keep it for clarity.
+
+The `text` operator will search for "cooking" in the `title` field. You should see a collection of documents returned on the right.
+
+Click the **Add Stage** button, scroll down, and select **$project** for Stage 2.
+
+<Screenshot alt="Stage 2 of the pipeline with the $project stage selected" src="img/screenshots/3-aggregations/1-search-stage/3-project-stage.png" url="https://cloud.mongodb.com" />
+
+Add the following implementation for the `$project` stage to filter the returned fields.
+
+```js
+{
+  title: 1,
+  authors: 1,
+  genres: 1,
+  pages: 1
+}
+```
+
+At this point, you should see similar results as what you did in the last section, as this is pretty much the same query.
+
+## Interactive Aggregation Practice
+
+Now try building these aggregation pipelines yourself!
+
+<InteractiveExercise
+  title="Basic $search Stage"
+  description="Create a search aggregation pipeline to find books about cooking."
+  initialQuery={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      text: {
+        query: "cooking",
+        path: {
+          "wildcard": "*"
+        }
+      }
+    }
+  }
+]`}
+  expectedResult={{
+    type: "minCount",
+    value: 1
+  }}
+  hint="Use the $search stage with the text operator to search for 'cooking'"
+  solution={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      text: {
+        query: "cooking",
+        path: {
+          "wildcard": "*"
+        }
+      }
+    }
+  }
+]`}
+  collection="books"
+/>
+
+### Adding Projection to Limit Fields
+
+<InteractiveExercise
+  title="Search with Projection"
+  description="Add a $project stage to limit the returned fields to just title, authors, and pages."
+  initialQuery={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      text: {
+        query: "cooking",
+        path: {
+          "wildcard": "*"
+        }
+      }
+    }
+  },
+  {
+    $project: {
+      title: 1,
+      authors: 1,
+      pages: 1
+    }
+  }
+]`}
+  expectedResult={{
+    type: "contains",
+    fields: ["title", "authors", "pages"]
+  }}
+  hint="Add a $project stage after the $search stage to limit returned fields"
+  solution={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      text: {
+        query: "cooking",
+        path: {
+          "wildcard": "*"
+        }
+      }
+    }
+  },
+  {
+    $project: {
+      title: 1,
+      authors: 1,
+      pages: 1
+    }
+  }
+]`}
+  collection="books"
+/>
+
+### Adding Limits and Sorting
+
+<InteractiveExercise
+  title="Complete Pipeline with Limit and Sort"
+  description="Create a pipeline that searches for programming books, limits to 5 results, and sorts by pages."
+  initialQuery={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      text: {
+        query: "programming",
+        path: {
+          "wildcard": "*"
+        }
+      }
+    }
+  },
+  {
+    $sort: { pages: -1 }
+  },
+  {
+    $limit: 5
+  },
+  {
+    $project: {
+      title: 1,
+      pages: 1,
+      year: 1
+    }
+  }
+]`}
+  expectedResult={{
+    type: "count",
+    value: 5
+  }}
+  hint="Use $search, $sort by pages descending, $limit to 5, and $project the needed fields"
+  solution={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      text: {
+        query: "programming",
+        path: {
+          "wildcard": "*"
+        }
+      }
+    }
+  },
+  {
+    $sort: { pages: -1 }
+  },
+  {
+    $limit: 5
+  },
+  {
+    $project: {
+      title: 1,
+      pages: 1,
+      year: 1
+    }
+  }
+]`}
+  collection="books"
+/>

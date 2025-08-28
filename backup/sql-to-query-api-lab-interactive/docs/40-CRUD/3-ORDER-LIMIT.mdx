@@ -1,0 +1,75 @@
+# 👐 ORDER BY → .sort() & LIMIT → .limit()
+
+In SQL, we use `ORDER BY` to sort query results and `LIMIT` to restrict the number of returned rows. MongoDB provides the `.sort()` and `.limit()` methods to achieve the same.
+
+---
+
+## **Sorting in MongoDB**
+
+- `{ field: 1 }` → **Ascending order** (A → Z, smallest to largest)
+- `{ field: -1 }` → **Descending order** (Z → A, largest to smallest)
+- You can sort by multiple fields, just like SQL.
+
+## **Limiting results**
+
+- `.limit(n)` restricts the number of documents returned.
+- Used together with `.sort()`, it helps fetch the **top N** results.
+
+---
+
+### 1: Top 5 books with the highest inventory
+
+<InteractiveQueryEditor
+  initialQuery='db.books.find().sort({ totalInventory: -1 }).limit(5)'
+/>
+
+**MongoDB syntax:**
+```js
+db.books.find().sort({ totalInventory: -1 }).limit(5);
+```
+
+**Equivalent SQL query:**
+```sql
+SELECT * FROM books ORDER BY totalInventory DESC LIMIT 5;
+```
+
+This fetches the **5 books with the highest stock**.
+
+---
+
+### 2: Get the title of top 10 fiction books by highest page count
+
+<InteractiveQueryEditor
+  initialQuery='db.books.find({ genres: "Fiction" }, { title: 1, pages: 1 }).sort({ pages: -1 }).limit(10)'
+/>
+
+**MongoDB syntax:**
+```js
+db.books
+  .find({ genres: "Fiction" }, { title: 1, pages: 1 })
+  .sort({ pages: -1 })
+  .limit(10);
+```
+
+:::info
+Along with the title, we fetched pages, as well, to ensure that we are getting the right results.
+:::
+
+**Equivalent SQL query:**
+```sql
+SELECT title, pages FROM books WHERE genres='Fiction' ORDER BY pages DESC LIMIT 10;
+```
+
+This returns the **top 10 available books** in the "Fiction" genre.
+
+---
+
+## Challenge
+
+<InteractiveExercise
+  title="Challenge: Find the first 10 books alphabetically by title"
+  description="Find the first 10 books alphabetically by title."
+  initialQuery='db.books.find({}).sort({title: 1}).limit(10)'
+  hint="Use sort() with title: 1 for ascending order and limit(10)"
+  solution='db.books.find({}).sort({title: 1}).limit(10)'
+/>

@@ -1,0 +1,224 @@
+# 📘 The `range` Operator
+
+The `range` operator is similar to `equals` but works on ranges of values.
+
+The `range` operator has the following syntax. You can find more explanation about it in the <Link to="https://www.mongodb.com/docs/atlas/atlas-search/range/">documentation</Link>.
+
+```js
+{
+   "$search": {
+      "index": <index name>, // optional, defaults to "default"
+      "range": {
+         "path": "<field-to-search>",
+         "gt | gte": <value-to-search>,
+         "lt | lte": <value-to-search>,
+         "score": <score-options>
+      }
+   }
+}
+```
+
+This could be useful if you wanted to query only for books that have a range of pages. Say you only want books between 100 and 300 pages. You could use the `range` operator to refine your results.
+
+## Interactive Range Search Practice
+
+<InteractiveExercise
+  title="Page Count Range"
+  description="Find books that have between 200 and 400 pages using the range operator."
+  initialQuery={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      range: {
+        path: "pages",
+        gte: 200,
+        lte: 400
+      }
+    }
+  },
+  {
+    $project: {
+      title: 1,
+      pages: 1,
+      year: 1
+    }
+  },
+  {
+    $limit: 10
+  }
+]`}
+  expectedResult={{
+    type: "minCount",
+    value: 1
+  }}
+  hint="Use gte: 200 and lte: 400 to find books with 200-400 pages"
+  solution={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      range: {
+        path: "pages",
+        gte: 200,
+        lte: 400
+      }
+    }
+  },
+  {
+    $project: {
+      title: 1,
+      pages: 1,
+      year: 1
+    }
+  },
+  {
+    $limit: 10
+  }
+]`}
+  collection="books"
+/>
+
+### Year Range Search
+
+<InteractiveExercise
+  title="Recent Books Search"
+  description="Find books published after 2000 using the range operator with gt (greater than)."
+  initialQuery={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      range: {
+        path: "year",
+        gt: 2000
+      }
+    }
+  },
+  {
+    $sort: { year: -1 }
+  },
+  {
+    $project: {
+      title: 1,
+      year: 1,
+      pages: 1
+    }
+  },
+  {
+    $limit: 10
+  }
+]`}
+  expectedResult={{
+    type: "minCount",
+    value: 1
+  }}
+  hint="Use gt: 2000 to find books published after the year 2000"
+  solution={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      range: {
+        path: "year",
+        gt: 2000
+      }
+    }
+  },
+  {
+    $sort: { year: -1 }
+  },
+  {
+    $project: {
+      title: 1,
+      year: 1,
+      pages: 1
+    }
+  },
+  {
+    $limit: 10
+  }
+]`}
+  collection="books"
+/>
+
+### Combining Text and Range
+
+<InteractiveExercise
+  title="Compound Search Query"
+  description="Combine text search for 'programming' with a range filter for books over 300 pages using compound."
+  initialQuery={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      compound: {
+        must: [
+          {
+            text: {
+              query: "programming",
+              path: {
+                "wildcard": "*"
+              }
+            }
+          },
+          {
+            range: {
+              path: "pages",
+              gt: 300
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    $project: {
+      title: 1,
+      pages: 1,
+      synopsis: 1,
+      score: { $meta: "searchScore" }
+    }
+  },
+  {
+    $limit: 5
+  }
+]`}
+  expectedResult={{
+    type: "minCount",
+    value: 1
+  }}
+  hint="Use compound.must with both text and range operators"
+  solution={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      compound: {
+        must: [
+          {
+            text: {
+              query: "programming",
+              path: {
+                "wildcard": "*"
+              }
+            }
+          },
+          {
+            range: {
+              path: "pages",
+              gt: 300
+            }
+          }
+        ]
+      }
+    }
+  },
+  {
+    $project: {
+      title: 1,
+      pages: 1,
+      synopsis: 1,
+      score: { $meta: "searchScore" }
+    }
+  },
+  {
+    $limit: 5
+  }
+]`}
+  collection="books"
+/>

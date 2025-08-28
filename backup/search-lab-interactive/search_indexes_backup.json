@@ -1,0 +1,46 @@
+=== SEARCH INDEX BACKUP ===
+Index Name: fulltextsearch
+Definition: {
+  "mappings": {
+    "dynamic": false,
+    "fields": {
+      "title": {
+        "type": "string"
+      },
+      "synopsis": {
+        "type": "string"
+      },
+      "genres": {
+        "type": "string"
+      }
+    }
+  }
+}
+---
+Index Name: fulltextsearch_dynamic
+Definition: {
+  "mappings": {
+    "dynamic": true
+  }
+}
+---
+Index Name: facetsIndexName
+Definition: {
+  "mappings": {
+    "dynamic": false,
+    "fields": {
+      "genres": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "stringFacet"
+        }
+      ],
+      "year": {
+        "type": "number"
+      }
+    }
+  }
+}
+---

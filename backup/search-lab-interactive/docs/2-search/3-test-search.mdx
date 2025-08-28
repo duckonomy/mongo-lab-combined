@@ -1,0 +1,143 @@
+# 👐 Testing the Search Index
+
+Now that you have a search index, you can test it out.
+
+From the list of indexes, look for the **Query** button.
+
+<Screenshot src="img/screenshots/2-search/3-test-search/1-query-button.png" alt="The Query button from the list of indexes" url="https://cloud.mongodb.com" />
+
+## Search Tester
+
+By using the **Query** button above, you will open the **Search Tester**. In the field, enter the word:
+
+```
+cooking
+```
+
+Look at the results you get.
+
+<Screenshot src="img/screenshots/2-search/3-test-search/2-search-tester.png" alt="The Search Tester" url="https://cloud.mongodb.com" />
+
+You can see that you get a list of books back including:
+* Pennsylvania Dutch _Cooking_: A Mennonite Community Cookbook.
+* Semi-Homemade _Cooking_: Quick, Marvelous Meals and Nothing is Made from…
+* Cookin' Cajun _Cooking_ School Cookbook - Creole and Cajun Cuisine from…
+
+All those results match the word _cooking_. Notice how capitalization doesn't matter. Neither does the placement of the word in the title. The search index is smart enough to find the word _cooking_ in all those titles.
+
+Already, you are providing a better experience to your developers.
+
+## Searching only the title
+
+This is great. However, this search query is searching the entire document. There might be some cases where that works for you, but in most cases, you'll likely want to limit this search only to the fields that matter. In this case, let's change it to only search the title.
+
+In the **Search Tester**, click on the **Edit $search query** button, next to the green **Search** button.
+
+This will open up the query editor.
+
+<Screenshot src="img/screenshots/2-search/3-test-search/3-query-editor.png" alt="The Edit $search query button" url="https://cloud.mongodb.com" />
+
+Notice that the `path` property currently shows `*`. This means that it will search the entire document. Try to change the search to only search the `title` field.
+
+:::tip
+You can find more information about how to construct a query path in the [Search documentation](https://www.mongodb.com/docs/atlas/atlas-search/path-construction/).
+:::
+
+<details>
+  <summary>Click here to see the answer</summary>
+  <div>
+
+```js
+[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      text: {
+        query: "cooking",
+        path: ["title"]
+      }
+    }
+  }
+]
+```
+
+</div>
+</details>
+
+You will see the same results but ordered differently. This has to do with relevancy, but we'll cover that in a later section.
+
+## Try it Yourself!
+
+Now you can test the search functionality directly in this documentation! The interactive editor below connects to a MongoDB Atlas cluster with the sample library data.
+
+<InteractiveExercise
+  title="Basic Text Search"
+  description="Try searching for books about cooking using a regular expression query while the search index builds."
+  initialQuery={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      text: {
+        query: "cooking",
+        path: {
+          "wildcard": "*"
+        }
+      }
+    }
+  }
+]`}
+  expectedResult={{
+    type: "minCount",
+    value: 1
+  }}
+  hint="Make sure to use the correct index name and search for 'cooking' in all fields using path: '*'"
+  solution={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      text: {
+        query: "cooking",
+        path: {
+          "wildcard": "*"
+        }
+      }
+    }
+  }
+]`}
+  collection="books"
+/>
+
+### Search Only in Title Field
+
+<InteractiveExercise
+  title="Title-Only Search"
+  description="Now try the same search, but limit it to only search in the title field."
+  initialQuery={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      text: {
+        query: "cooking",
+        path: ["title"]
+      }
+    }
+  }
+]`}
+  expectedResult={{
+    type: "contains",
+    fields: ["title"]
+  }}
+  hint="Change the path from '*' to ['title'] to search only in the title field"
+  solution={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      text: {
+        query: "cooking",
+        path: ["title"]
+      }
+    }
+  }
+]`}
+  collection="books"
+/>

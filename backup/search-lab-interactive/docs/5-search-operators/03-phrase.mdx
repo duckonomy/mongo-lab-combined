@@ -1,0 +1,192 @@
+# 📘 The `phrase` Operator
+
+The `phrase` operator is used to search for a group of words in a specific order. It is similar to the `match` operator, except that it will match anywhere in the text, not just at the beginning.
+
+You can find more details on the phrase operator in the <Link to="https://www.mongodb.com/docs/atlas/atlas-search/phrase/">official documentation</Link>.
+
+```js
+{
+  $search: {
+     "index": <index name>, // optional, defaults to "default"
+     "phrase": {
+       "query": "<search-string>",
+       "path": "<field-to-search>",
+       "score": <options>,
+       "slop": <distance-number>
+     }
+  }
+}
+```
+The usage itself is very similar to how you would use the `text` operator.
+
+## The `slop` property
+
+The `slop` property is used to specify how far apart the words in the phrase can be. The default value is `0`, which means that the words must be in the exact order specified in the query. If you set the value to `1`, then the words can be one word apart, and so on.
+
+## Interactive Phrase Search Practice
+
+<InteractiveExercise
+  title="Exact Phrase Search"
+  description="Search for the exact phrase 'home cooking' in book titles and descriptions."
+  initialQuery={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      phrase: {
+        query: "home cooking",
+        path: {
+          "wildcard": "*"
+        }
+      }
+    }
+  },
+  {
+    $project: {
+      title: 1,
+      synopsis: 1,
+      score: { $meta: "searchScore" }
+    }
+  }
+]`}
+  expectedResult={{
+    type: "minCount",
+    value: 1
+  }}
+  hint="Use the phrase operator to find the exact phrase 'home cooking'"
+  solution={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      phrase: {
+        query: "home cooking",
+        path: {
+          "wildcard": "*"
+        }
+      }
+    }
+  },
+  {
+    $project: {
+      title: 1,
+      synopsis: 1,
+      score: { $meta: "searchScore" }
+    }
+  }
+]`}
+  collection="books"
+/>
+
+### Phrase Search with Slop
+
+<InteractiveExercise
+  title="Flexible Phrase Search"
+  description="Search for 'quick easy' but allow 1-2 words between them using the slop parameter."
+  initialQuery={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      phrase: {
+        query: "quick easy",
+        path: {
+          "wildcard": "*"
+        },
+        slop: 2
+      }
+    }
+  },
+  {
+    $project: {
+      title: 1,
+      synopsis: 1,
+      score: { $meta: "searchScore" }
+    }
+  }
+]`}
+  expectedResult={{
+    type: "minCount",
+    value: 1
+  }}
+  hint="Use slop: 2 to allow up to 2 words between 'quick' and 'easy'"
+  solution={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      phrase: {
+        query: "quick easy",
+        path: {
+          "wildcard": "*"
+        },
+        slop: 2
+      }
+    }
+  },
+  {
+    $project: {
+      title: 1,
+      synopsis: 1,
+      score: { $meta: "searchScore" }
+    }
+  }
+]`}
+  collection="books"
+/>
+
+### Compare Text vs Phrase
+
+<InteractiveExercise
+  title="Understanding the Difference"
+  description="Compare phrase search vs text search for 'new york'. Notice how phrase finds the exact phrase while text finds either word."
+  initialQuery={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      phrase: {
+        query: "new york",
+        path: {
+          "wildcard": "*"
+        }
+      }
+    }
+  },
+  {
+    $project: {
+      title: 1,
+      synopsis: 1,
+      score: { $meta: "searchScore" }
+    }
+  },
+  {
+    $limit: 5
+  }
+]`}
+  expectedResult={{
+    type: "minCount",
+    value: 1
+  }}
+  hint="Change 'phrase' to 'text' to see the difference in results"
+  solution={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      phrase: {
+        query: "new york",
+        path: {
+          "wildcard": "*"
+        }
+      }
+    }
+  },
+  {
+    $project: {
+      title: 1,
+      synopsis: 1,
+      score: { $meta: "searchScore" }
+    }
+  },
+  {
+    $limit: 5
+  }
+]`}
+  collection="books"
+/>
+

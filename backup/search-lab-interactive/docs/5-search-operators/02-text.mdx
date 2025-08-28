@@ -1,0 +1,179 @@
+# 📘 The `text` Operator
+
+The `text` operator is used to perform a full-text search using the analyzer that you specify in the index configuration. It is used to search for words or phrases in the full-text fields of your documents.
+
+The `text` operator uses the `OR` operator to combine the search terms. For example, if you search for `Joy of Cooking`, the search will return all documents that contain either `Joy`, `of`, `Cooking`, or a combination of those.
+
+:::caution
+This can sometimes be the desired outcome, but it might also return a lot of undesired results. Those documents containing the word `of`, for example, are most likely not relevant to your search.
+:::
+
+We've already covered the `path` property, but there are other properties that you can use with the `text` operator.
+
+The full definition of the text operator goes as follows. More details can be found in the <Link to="https://www.mongodb.com/docs/atlas/atlas-search/text/">documentation</Link>.
+
+```js
+{
+  $search: {
+    "index": <index name>, // optional, defaults to "default"
+    "text": {
+      "query": "<search-string>",
+      "path": "<field-to-search>",
+      "fuzzy": <options>,
+      "score": <options>,
+      "synonyms": "<synonyms-mapping-name>"
+    }
+  }
+}
+```
+
+Let's take a look at each of these properties.
+
+## The `fuzzy` property
+
+Fuzzy search is a technique that allows you to search for terms that are similar to the one you are looking for. It is useful when your users might make typos or spelling mistakes in their search queries.
+
+There are many options you can use with the `fuzzy` property, and you can find out more in the docs. For now, we'll focus on the `maxEdits` option. MaxEdits will specify the number of one-character edits that can be made to find a match.
+
+For example, if you search for `Alice`, you should find the book _Alice in Wonderland_. However, if you make one, or multiple typos — such as `Alyse`, `Alise`, or `Allice` — you will not find the book. This is where the `maxEdits` option comes in handy. With a maxEdits of one, you will find the book even if you make one typo.
+
+## The `synonyms` property
+
+The synonyms property allows you to specify a mapping of synonyms that will be used in your search. For example, if you search for `car`, you might want to find documents that contain the word `automobile` as well. You can specify a mapping of synonyms in your index configuration and then use the `synonyms` property in your search query to use that mapping.
+
+## Interactive Text Search Practice
+
+<InteractiveExercise
+  title="Basic Text Search"
+  description="Search for books containing the word 'alice' using the text operator."
+  initialQuery={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      text: {
+        query: "alice",
+        path: {
+          "wildcard": "*"
+        }
+      }
+    }
+  }
+]`}
+  expectedResult={{
+    type: "minCount",
+    value: 1
+  }}
+  hint="Use the text operator with the query 'alice'"
+  solution={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      text: {
+        query: "alice",
+        path: {
+          "wildcard": "*"
+        }
+      }
+    }
+  }
+]`}
+  collection="books"
+/>
+
+### Fuzzy Search Practice
+
+<InteractiveExercise
+  title="Fuzzy Search for Typos"
+  description="Search for 'programing' (missing 'm') using fuzzy search to find programming books."
+  initialQuery={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      text: {
+        query: "programing",
+        path: {
+          "wildcard": "*"
+        },
+        fuzzy: {
+          maxEdits: 1
+        }
+      }
+    }
+  }
+]`}
+  expectedResult={{
+    type: "minCount",
+    value: 1
+  }}
+  hint="Use the fuzzy property with maxEdits: 1 to handle typos"
+  solution={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      text: {
+        query: "programing",
+        path: {
+          "wildcard": "*"
+        },
+        fuzzy: {
+          maxEdits: 1
+        }
+      }
+    }
+  }
+]`}
+  collection="books"
+/>
+
+### Multiple Terms Search
+
+<InteractiveExercise
+  title="Search Multiple Terms"
+  description="Search for books about 'web development' - remember that text uses OR by default."
+  initialQuery={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      text: {
+        query: "web development",
+        path: {
+          "wildcard": "*"
+        }
+      }
+    }
+  },
+  {
+    $project: {
+      title: 1,
+      synopsis: 1,
+      score: { $meta: "searchScore" }
+    }
+  }
+]`}
+  expectedResult={{
+    type: "minCount",
+    value: 1
+  }}
+  hint="The text operator will find documents containing either 'web' OR 'development'"
+  solution={`[
+  {
+    $search: {
+      index: "fulltextsearch_dynamic",
+      text: {
+        query: "web development",
+        path: {
+          "wildcard": "*"
+        }
+      }
+    }
+  },
+  {
+    $project: {
+      title: 1,
+      synopsis: 1,
+      score: { $meta: "searchScore" }
+    }
+  }
+]`}
+  collection="books"
+/>

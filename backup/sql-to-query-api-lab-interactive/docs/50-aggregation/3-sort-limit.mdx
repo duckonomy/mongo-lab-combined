@@ -1,0 +1,141 @@
+import Tabs from "@theme/Tabs";
+import TabItem from "@theme/TabItem";
+
+# 👐 $sort and $limit
+
+## 🔹 $sort → Sorting results
+
+### Syntax
+
+```js
+{
+  $sort: {
+    field: 1,
+  }
+}
+```
+
+- `{ field: 1 }` → **Ascending order** (A → Z, smallest to largest)
+- `{ field: -1 }` → **Descending order** (Z → A, largest to smallest)
+- You can sort by multiple fields, just like SQL.
+
+### Example: Find the most recent reviews on our app.
+
+```js
+db.reviews.aggregate([
+  {
+    $sort: { timestamp: -1 },
+  },
+]);
+```
+
+### **Equivalent SQL query**
+
+```sql
+SELECT * FROM books ORDER BY timestamp DESC;
+```
+
+---
+
+## 🔹 $limit → Limiting the number of results
+
+### Syntax
+
+```json
+{
+  $limit: n
+}
+```
+
+- n is the maximum number of documents you want in your results.
+
+### Example: Find the 5 most recent reviews on our app
+
+```js
+db.reviews.aggregate([
+  {
+    $sort: { timestamp: -1 },
+  },
+  {
+    $limit: 5,
+  },
+]);
+```
+
+### **Equivalent SQL query**
+
+```sql
+SELECT * FROM books ORDER BY timestamp DESC LIMIT 5;
+```
+
+---
+
+## 👐 Challenge
+
+### 👐 1. After the year 2000, which book has the most number of authors?
+
+<details>
+  <summary>Answer</summary>
+  <div>
+  There are 2 ways to solve this- 
+  - $project
+  - $addFields
+
+:::info
+Learn [when to use $addFields over $project](https://www.practical-mongodb-aggregations.com/guides/project.html?highlight=%24project#when-to-use-project)
+:::
+
+  <Tabs groupId="aggregations">
+    <TabItem value="mongodb-shell" label="Using $project">
+      ```js
+      db.books.aggregate([
+        {
+          $match: { year: { $gt: 2000 } }
+        },
+        {
+          $match: {
+            authors: { $exists: true },
+          }
+        },
+        {
+          $addFields: {
+            numAuthors: { $size: "$authors" },
+          }
+        },
+        {
+          $sort: { "numAuthors": -1 }
+        },
+        {
+          $limit: 1
+        }
+      ]);
+      ```
+    </TabItem>
+    <TabItem value="atlas" label="Using $addFields">
+    ```js
+    db.books.aggregate([
+      {
+        $match: { year: { $gt: 2000 } }
+      },
+      {
+        $match: {
+          authors: { $exists: true },
+        }
+      },
+      {
+        $addFields: {
+          numAuthors: { $size: "$authors" },
+        }
+      },
+      {
+        $sort: { "numAuthors": -1 }
+      },
+      {
+        $limit: 1
+      }
+    ]);
+    ```
+    </TabItem>
+  </Tabs>
+  </div>
+</details>

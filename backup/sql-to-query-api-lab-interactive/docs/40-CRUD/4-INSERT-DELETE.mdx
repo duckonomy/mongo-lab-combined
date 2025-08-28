@@ -1,0 +1,93 @@
+# 👐 INSERT → insertOne() & DELETE → deleteOne()
+
+MongoDB provides two methods for inserting documents into a collection:
+
+- `.insertOne()`: Inserts a single document
+- `.insertMany()`: Inserts multiple documents at once
+
+And just like insert, MongoDB provides:
+
+- `.deleteOne()`: Deletes the first matching document.
+- `.deleteMany()`: Deletes all matching documents.
+
+## Example: Insert a new review
+
+<InteractiveQueryEditor
+  initialQuery='db.reviews.insertOne({"text": "Best book I have ever read.", "rating": 5, "name": "Jack", "bookId": "0786222727"})'
+/>
+
+**MongoDB syntax:**
+```js
+db.reviews.insertOne({
+  text: "Best book I have ever read.",
+  rating: 5,
+  name: "Jack",
+  bookId: "0786222727",
+});
+```
+
+**Equivalent SQL query:**
+```sql
+INSERT INTO reviews (text, rating, name, bookId)
+VALUES ('Best book I have ever read.', 5, 'Jack', '0786222727');
+```
+
+## Example: Insert multiple reviews
+
+<InteractiveQueryEditor
+  initialQuery='db.reviews.insertMany([{"text": "Amazing plot.", "rating": 5, "name": "John", "bookId": "0786222727"}, {"text": "Over-hyped, tbh I feel it is very boring!", "rating": 2, "name": "Nick", "bookId": "0786222727"}])'
+/>
+
+**MongoDB syntax:**
+```js
+db.reviews.insertMany([
+  {
+    text: "Amazing plot.",
+    rating: 5,
+    name: "John",
+    bookId: "0786222727",
+  },
+  {
+    text: "Over-hyped, tbh I feel it's very boring!",
+    rating: 2,
+    name: "Nick",
+    bookId: "0786222727",
+  },
+]);
+```
+
+## Example: Delete one review
+
+<InteractiveQueryEditor
+  initialQuery='db.reviews.deleteOne({"bookId": "0786222727"})'
+/>
+
+**MongoDB syntax:**
+```js
+db.reviews.deleteOne({
+  bookId: "0786222727",
+});
+```
+
+**Equivalent SQL query:**
+```sql
+DELETE FROM reviews WHERE bookId = '0786222727';
+```
+
+## Challenge
+
+<InteractiveExercise
+  title="Challenge 1: Insert multiple reviews"
+  description="Insert 4 more reviews for bookId '0786222727'."
+  initialQuery='db.reviews.insertMany([{"text": "Thrilling end.", "rating": 4, "name": "Mark", "bookId": "0786222727"}, {"text": "Must read!", "rating": 5, "name": "Raj", "bookId": "0786222727"}, {"text": "Very expensive", "rating": 3, "name": "Yun", "bookId": "0786222727"}, {"text": "Extremely satisfied!", "rating": 5, "name": "Lisa", "bookId": "0786222727"}])'
+  hint="Use insertMany() with an array of review objects"
+  solution='db.reviews.insertMany([{"text": "Thrilling end.", "rating": 4, "name": "Mark", "bookId": "0786222727"}, {"text": "Must read!", "rating": 5, "name": "Raj", "bookId": "0786222727"}, {"text": "Very expensive", "rating": 3, "name": "Yun", "bookId": "0786222727"}, {"text": "Extremely satisfied!", "rating": 5, "name": "Lisa", "bookId": "0786222727"}])'
+/>
+
+<InteractiveExercise
+  title="Challenge 2: Delete multiple reviews"
+  description="Delete all reviews for bookId '0786222727' with a single command."
+  initialQuery='db.reviews.deleteMany({"bookId": "0786222727"})'
+  hint="Use deleteMany() to delete multiple documents matching a condition"
+  solution='db.reviews.deleteMany({"bookId": "0786222727"})'
+/>

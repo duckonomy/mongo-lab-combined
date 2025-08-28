@@ -1,0 +1,101 @@
+# 👐 UPDATE → updateOne(), updateMany()
+
+To modify existing documents, MongoDB provides:
+
+- `.updateOne()`: Updates the first matching document.
+- `.updateMany()`: Updates all matching documents.
+
+## Syntax
+
+```js
+db.collection.updateOne(
+  { <query> },
+  { <update operation> },
+  { <options> }
+)
+```
+
+- `<query>`: Specifies which document to update
+
+- `<update operation>`: Defines modifications using update operators like $set, $inc, etc.
+
+- `<options>`: (Optional) Allows additional configurations like upsert: true
+
+## Example: Update a book
+
+<InteractiveQueryEditor
+  initialQuery='db.reviews.updateOne({"bookId": "0312979509"}, {"$set": {"rating": 5}})'
+/>
+
+**MongoDB syntax:**
+```js
+db.reviews.updateOne(
+  { bookId: "0312979509" }, // <-- query
+  { $set: { rating: 5 } } // <-- update operation
+);
+```
+
+**Equivalent SQL query:**
+```sql
+UPDATE reviews SET rating = 5 WHERE bookId = '0312979509';
+```
+
+## Upsert option
+
+Let's say we want to update a review in our database from "John" for the book "0312979509" by rating it 5 stars.
+
+<InteractiveQueryEditor
+  initialQuery='db.reviews.updateOne({"name": "John", "bookId": "0312979509"}, {"$set": {"rating": 5}})'
+/>
+
+**MongoDB syntax:**
+```js
+db.reviews.updateOne(
+  { name: "John", bookId: "0312979509" },
+  { $set: { rating: 5 } }
+);
+```
+
+Suppose "John" had never posted a review for this book before. The above query won't really do anything.
+In some cases, we may want to store a fresh new review based on the condition and updates mentioned in query.
+To handle such scenarios in MongoDB, we don't have to write additional application code to achieve this. All we have to do is utilize the `upsert` option.
+
+<InteractiveQueryEditor
+  initialQuery='db.reviews.updateOne({"name": "John", "bookId": "0312979509"}, {"$set": {"rating": 5}}, {"upsert": true})'
+/>
+
+**MongoDB syntax:**
+```js
+db.reviews.updateOne(
+  { name: "John", bookId: "0312979509" },
+  { $set: { rating: 5 } },
+  { upsert: true } //<-- option
+);
+```
+
+:::info
+
+Executing the above command will insert a fresh new document in the collection, like this:
+
+```js
+{
+  _id: ObjectId('679d...'),
+  bookId: '0312979509',
+  name: 'John',
+  rating: 5
+}
+```
+
+:::
+
+---
+
+## Challenge
+
+<InteractiveExercise
+  title="Challenge: Update book pages"
+  description="Update the pages of the book 'Treasure of the Sun' to 449."
+  initialQuery='db.books.updateOne({"title": "Treasure of the Sun"}, {"$set": {"pages": 449}})'
+  hint="Use updateOne() with $set operator to update the pages field"
+  solution='db.books.updateOne({"title": "Treasure of the Sun"}, {"$set": {"pages": 449}})'
+/>

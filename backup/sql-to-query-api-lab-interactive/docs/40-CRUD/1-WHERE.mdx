@@ -1,0 +1,149 @@
+# 👐 WHERE → .find()
+
+Similar to SQL's `WHERE` clause, the `.find()` method in MongoDB retrieves documents from a collection that matches a specified query.
+
+## Syntax
+
+```js
+db.collection.find({ <query> })
+```
+
+- `<query>`: Specifies conditions to filter documents
+
+## Example: Find all books from 2020
+
+Try this query to find all books from 2020:
+
+<InteractiveQueryEditor
+  initialQuery='db.books.find({ year: 2020 })'
+/>
+
+```js
+db.books.find({ year: 2020 });
+```
+
+### Equivalent SQL query
+
+```sql
+SELECT * FROM books WHERE year = 2020;
+```
+
+## Filtering with `find()`
+
+The `find()` method takes a document as its first argument. This document specifies the filter criteria. You can use a variety of expressions within the filter document:
+
+- **Comparison operators:** `$eq` (equals), `$ne` (not equals), `$gt` (greater than), `$lt` (less than), `$gte` (greater than or equals), `$lte` (less than or equals), `$in` (in an array), `$nin` (not in an array)
+- **Logical operators:** `$and`, `$or`, `$not`
+- **Element operators:** `$exists` (check for field existence), `$type` (check data type)
+- **Evaluation operators:** `$regex` (regular expression matching), `$where` (JavaScript code execution)
+- **Geo-spatial operators:** For location-based queries
+- **Array operators:** For querying arrays
+
+Now, let's utilize a few MongoDB operators and create more sophisticated queries:
+
+### $or and $gt operators
+
+Suppose we want to get all of the books that were written in 2010 or that have more than 200 pages.
+
+<InteractiveQueryEditor
+  initialQuery='db.books.find({ $or: [{ year: 2010 }, { pages: { $gt: 200 } }] })'
+/>
+
+**Equivalent SQL:**
+```sql
+SELECT * FROM books WHERE year = 2010 OR pages > 200;
+```
+
+**MongoDB syntax:**
+```js
+db.books.find({
+  $or: [
+    { year: 2010 }, // <--- 1st condition
+    { pages: { $gt: 200 } }, // <--- 2nd condition
+  ],
+});
+```
+
+### $and operator
+
+This time, instead of OR, let's query using AND:
+
+<InteractiveQueryEditor
+  initialQuery='db.books.find({ $and: [{ year: 2010 }, { pages: { $gt: 200 } }] })'
+/>
+
+**Equivalent SQL:**
+```sql
+SELECT * FROM books WHERE year = 2010 AND pages > 200;
+```
+
+**MongoDB syntax:**
+```js
+db.books.find({
+  $and: [
+    { year: 2010 }, // <--- 1st condition
+    { pages: { $gt: 200 } }, // <--- 2nd condition
+  ],
+});
+```
+
+### Shorthand $and
+
+When we are querying on two different fields and want to utilize $and, we can do so by passing a document with all the conditions, like this:
+
+<InteractiveQueryEditor
+  initialQuery='db.books.find({ year: 2010, pages: { $gt: 200 } })'
+/>
+
+**MongoDB syntax:**
+```js
+db.books.find({ year: 2010, pages: { $gt: 200 } });
+```
+
+As you can see, we don't have to pass an array of conditions. MongoDB implicitly considers this as $and.
+
+Now, test your knowledge with these interactive exercises:
+
+<InteractiveExercise
+  title="Challenge 1: Find books by exact inventory"
+  description="Find all books where totalInventory is exactly 5."
+  initialQuery='db.books.find({ totalInventory: 5 })'
+  hint="Use exact equality matching with totalInventory field"
+  solution='db.books.find({ totalInventory: 5 })'
+/>
+
+<InteractiveExercise
+  title="Challenge 2: Find books with many pages"
+  description="Find all books with more than 300 pages."
+  initialQuery='db.books.find({ pages: { $gt: 300 } })'
+  hint="Use the $gt operator to find pages greater than 300"
+  solution='db.books.find({ pages: { $gt: 300 } })'
+/>
+
+<InteractiveExercise
+  title="Challenge 3: Complex filtering"
+  description="Find books in the Science genre that are more than 300 pages long."
+  initialQuery='db.books.find({ genres: "Science", pages: { $gt: 300 } })'
+  hint="Use genres field (it's an array) and combine with pages filter"
+  solution='db.books.find({ genres: "Science", pages: { $gt: 300 } })'
+/>
+
+
+<details>
+  <summary>Answers</summary>
+
+  **Challenge 1:**
+  ```js
+  db.books.find({ totalInventory: 5 });
+  ```
+
+  **Challenge 2:**
+  ```js
+  db.books.find({ pages: {$gt: 300} });
+  ```
+
+  **Challenge 3:**
+  ```js
+  db.books.find({ "genre.name": "Science", pages: {$gt: 300} });
+  ```
+</details>
