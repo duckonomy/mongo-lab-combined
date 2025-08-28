@@ -19,7 +19,7 @@ const InteractiveQueryEditor = ({
 
   const defaultQueryExecute = async (query, callback) => {
     try {
-      const response = await axios.post('http://localhost:3001/api/search/execute', {
+      const response = await axios.post('http://localhost:8080/api/search/execute', {
         query: query.trim(),
         collection: collection
       });
