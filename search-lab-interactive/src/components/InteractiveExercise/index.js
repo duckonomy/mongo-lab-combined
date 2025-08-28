@@ -16,7 +16,7 @@ const InteractiveExercise = ({
 
   const executeQuery = async (query, callback) => {
     try {
-      const response = await axios.post('http://localhost:8080/api/search/execute', {
+      const response = await axios.post('https://sql-to-query-api-lab-interactive-production.up.railway.app/api/search/execute', {
         query: query.trim(),
         collection: collection
       });

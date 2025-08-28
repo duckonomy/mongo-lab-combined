@@ -18,7 +18,7 @@ const InteractiveQueryEditor = ({
 
   const defaultQueryExecute = async (query, callback) => {
     try {
-      const response = await axios.post('http://localhost:8080/api/query/execute', {
+      const response = await axios.post('https://sql-to-query-api-lab-interactive-production.up.railway.app/api/query/execute', {
         query: query.trim()
       });
 
